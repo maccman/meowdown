@@ -91,16 +91,17 @@ describe('ProseKitEditor', () => {
     expect(ref.current?.getSelection()).toMatchObject({ type: 'text', anchor: 21, head: 21 })
   })
 
-  it('replaces the current selection with the inserted fragment', async () => {
+  it('collapses an active selection instead of deleting it', async () => {
     const ref = createRef<EditorHandle>()
     const screen = await render(<ProseKitEditor ref={ref} initialMarkdown="Hello world" />)
     await expect.element(screen.getByText('Hello world')).toBeInTheDocument()
 
-    // "Hello" is selected.
+    // "Hello" is selected. A host-initiated insert is not a paste: the
+    // selected text must survive, with the fragment landing at the caret.
     ref.current?.setSelection({ type: 'text', anchor: 1, head: 6 })
-    ref.current?.insertMarkdown('Goodbye')
+    ref.current?.insertMarkdown('Goodbye ')
 
-    expect(ref.current?.getMarkdown()).toBe('Goodbye world\n')
+    expect(ref.current?.getMarkdown()).toBe('Goodbye Hello world\n')
   })
 
   it('inserts a multi-block fragment as blocks with the cursor at its end', async () => {

@@ -230,7 +230,11 @@ export function ProseKitEditor({
       const slice = isLoneParagraph
         ? new Slice(content, 1, 1)
         : new Slice(content, 0, Slice.maxOpen(content).openEnd)
-      editor.view.dispatch(editor.state.tr.replaceSelection(slice).scrollIntoView())
+      // Collapse any selection first: this is a host-initiated insert (a
+      // template, not a paste), and it must never delete user content.
+      const transaction = editor.state.tr
+      transaction.setSelection(TextSelection.near(transaction.selection.$from))
+      editor.view.dispatch(transaction.replaceSelection(slice).scrollIntoView())
     }
     function setSelection(selection: SelectionHint): void {
       setState(undefined, selection)

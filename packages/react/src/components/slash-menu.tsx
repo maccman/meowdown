@@ -158,11 +158,12 @@ export function SlashMenu({ timeFormat = '12', onSlashMenuSearch }: SlashMenuPro
           {/* Host items come after the built-ins. The autocomplete removes the
               typed `/query` text and closes the menu before `onSelect` runs,
               so a handler can insert straight at the cursor. Filtering matches
-              `value` (the label) the same way the built-in items are matched. */}
+              `value` — the label plus any `keywords` — the same way the
+              built-in items are matched. */}
           {hostItems.map((item) => (
             <AutocompleteItem
               key={item.id ?? item.label}
-              value={item.label}
+              value={[item.label, ...(item.keywords ?? [])].join(' ')}
               className={styles.Item}
               onSelect={item.onSelect}
             >
